@@ -38,6 +38,20 @@ func (a *Array) Insert(item int) {
 	a.count++
 }
 
+func (a *Array) InsertAt(item, index int) error {
+	exLastItemAdd := len(a.items) -1
+	if index > exLastItemAdd || index < 0 {
+		return ErrIllegalArg
+	}
+	a.items = append(a.items, a.items[exLastItemAdd])
+	for i := exLastItemAdd - 1; i >= index; i--{
+			a.items[i + 1] = a.items[i]
+	}
+	a.items[index] = item
+	a.count++
+	return nil
+}
+
 func (a *Array) RemoveAt(index int) error {
 	// Validate the index
 	if index < 0 || index >= a.count {
