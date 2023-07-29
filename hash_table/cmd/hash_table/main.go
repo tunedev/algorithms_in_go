@@ -21,9 +21,9 @@ func main() {
 
 	fmt.Println(table)
 
-	fmt.Println("Most frequent",mostFrequent([]int{1,2,2,3,3,3,4}))
-	fmt.Println("count unique pairs",countPairsWithDiff([]int{1,7,5,9,2,12,3}, 2))
-	fmt.Println("two sums",twoSum([]int{2,7,11,15}, 9))
+	// fmt.Println("Most frequent",mostFrequent([]int{1,2,2,3,3,3,4}))
+	// fmt.Println("count unique pairs",countPairsWithDiff([]int{1,7,5,9,2,12,3}, 2))
+	// fmt.Println("two sums",twoSum([]int{2,7,11,15}, 9))
 }
 
 func mostFrequent(input []int) int {

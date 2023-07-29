@@ -25,18 +25,52 @@ type Entry[T comparable] struct {
 type HashTable[T comparable] struct{
 	items []*l.LinkedList[*Entry[T]]
 	size int
+	loadFactor float64
+	treshold int
 }
 
 var ErrKeyDoesNotExist = errors.New("key does not exist")
 
-func NewHashTable[T comparable](size int) *HashTable[T] {
+func NewHashTable[T comparable](arg ...int) *HashTable[T] {
+	size :=  16
+	if len(arg) > 0 {
+		size = arg[0]
+	}
+	loadFactor := 0.75
 	return &HashTable[T]{
 		items: make([]*l.LinkedList[*Entry[T]], size),
 		size: size,
+		loadFactor: loadFactor,
+		treshold: int(float64(size) * loadFactor),
 	}
 }
 
+func (h *HashTable[T]) resize() {
+	newSize := h.size * 2;
+	newItems := make([]*l.LinkedList[*Entry[T]], newSize)
+
+	for i := 0; i < h.size; i++ {
+		if h.items[i] != nil {
+			for _, entry := range h.items[i].ToArray() {
+				newHash := h.hashWithSize(entry.key, newSize)
+				if newItems[newHash] == nil {
+					newItems[newHash] = l.NewLinkedList[*Entry[T]]()
+				}
+				newItems[newHash].AddLast(entry)
+			}
+		}
+	}
+
+	h.size = newSize
+	h.items = newItems
+	h.treshold = int(float64(newSize) * h.loadFactor)
+}
+
 func (h *HashTable[T]) Put(k int, val T) {
+	if len(h.items) >= h.treshold {
+		h.resize()
+	}
+
 	hash := h.hash(k)
 	if h.items[hash] == nil {
 		h.items[hash] = l.NewLinkedList[*Entry[T]]()
@@ -85,6 +119,10 @@ func (h *HashTable[T]) Remove(k int) error {
 
 func (h *HashTable[T]) hash(key int) int {
 	return int(math.Abs(float64(key))) % h.size
+}
+
+func (h *HashTable[T]) hashWithSize(key int, size int) int {
+	return int(math.Abs(float64(key))) % size
 }
 
 func (h *HashTable[T]) String() string {
